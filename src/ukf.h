@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include "tools.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -67,6 +68,14 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  ///* the current NIS for radar
+  double NIS_radar_;
+
+  ///* the current NIS for laser
+  double NIS_laser_;
+
+  ///* State dimension of measurement data
+  int n_z_;
 
   /**
    * Constructor
@@ -102,6 +111,45 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+  /**
+   * Functions from the tutorial
+  */
+
+  /**
+   * Generate sigma points, not used
+  */
+  void GenerateSigmaPoints(MatrixXd* Xsig_out);
+
+  /**
+   * Generate augmented sigma points
+  */
+  void AugmentedSigmaPoints(MatrixXd* Xsig_out);
+  
+  /**
+   * Predict sigma points, since object is moving
+  */
+  void SigmaPointPrediction(MatrixXd & Xsig_aug, double delta_t);
+
+  /**
+   * Predict state mean and P variance
+  */  
+  void PredictMeanAndCovariance();
+
+  /**
+   * Generate measurement error covaraince, generante predicted measurement z_pred, generate measurement space sigma points
+  */
+  void PredictRadarMeasurement(VectorXd* z_out, MatrixXd* S_out, MatrixXd* Zsig_out);
+
+  /**
+   * Generate measurement error covaraince, generante predicted measurement z_pred, generate measurement space sigma points
+  */
+  void PredictLidarMeasurement(VectorXd* z_out, MatrixXd* S_out, MatrixXd* Zsig_out);
+  
+  /**
+   * Update state x and P with real data z
+  */
+  void UpdateState(MatrixXd & Zsig, VectorXd & z_pred, MatrixXd & S, VectorXd & z);
 };
 
 #endif /* UKF_H */
